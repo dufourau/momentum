@@ -2,8 +2,8 @@ dataFilename=paste(getwd(),"/data_final.csv", sep="")
 mydata = read.csv(dataFilename,stringsAsFactors=FALSE) 
 stockVector<-NULL;
 currentStockNumber<-mydata$stock_number[1];
-minYear<-1991;
-maxYear<-1992;
+minYear<-1965;
+minMonth<-1;
 
 currentYear<- minYear;
 currentMonth<- min(mydata$month)-1;
