@@ -3,8 +3,8 @@ mydata = read.csv(dataFilename,stringsAsFactors=FALSE)
 stockVector<-NULL;
 indexVector<-NULL;
 currentStockNumber<-mydata$stock_number[1];
-minYear<-1965;
-minMonth<-8;
+minYear<-1966;
+minMonth<-7;
 
 count= 0 ;
 #Loop over all rows
