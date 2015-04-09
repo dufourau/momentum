@@ -1,52 +1,52 @@
-
 dataFilenameFacteurs=paste(getwd(),"/facteurs.csv", sep="")
 dataFacteurs = read.csv(dataFilenameFacteurs,stringsAsFactors=FALSE) 
-currentStockNumber<-mydata$stock_number[1];
-currentYear<- mydata$year[1];
-currentMonth<- mydata$month[1];
 mydata[["rf"]] = 0;
-#Récurépération des taux sans risque à chacun des mois de chaque année
-#for(i in 2:nrow(mydata)-1)
-#{ 
-#  indFacteur = intersect(which(dataFacteurs$year ==currentYear),which(dataFacteurs$month ==currentMonth))
-#  rf= as.numeric(dataFacteurs$Risk.Free.Return[indFacteur]);
-#  mydata$rf[i] = rf;
-
-#  currentYear<- mydata$year[i];
-#  currentMonth<- mydata$month[i];
-#}
-
 #date de début est une année
 #on considère la renta arithmétique sur les 6 premiers mois donnés pour cette année
+#Final result here
+matrixBottom<-matrix(nrow=20, ncol=10)
+matrixTop<-matrix(nrow=20, ncol=10)
+
 firstYear= 1966;
 firstMonth = 7;
-renta <- NULL;
-renta_top<-NULL;
-renta_bottom<-NULL;
-renta_arithmetique<-NULL;
-currentYear<- firstYear;
-currentMonth<- firstMonth;
-currentStockNumber<- 1;
-indexVector<- NULL;
-indexVectorTop <- NULL;
-indexVectorBottom<- NULL;
-	date = 0;
+
+#Loop for 20 year and create the best and worstportfolio
+for(j in 0:19){
+  renta <- NULL;
+  renta_top<-NULL;
+  renta_bottom<-NULL;
+  renta_arithmetique<-NULL;
+  indexVector<- NULL;
+  indexVectorTop <- NULL;
+  indexVectorBottom<- NULL;
+  currentYear<- firstYear+j;
+  currentMonth<- firstMonth-1;
+  currentStockNumber<- 1;
+  #For each asset loop over 6 months
+  date = 0;
 	for(i in 2:nrow(mydata)-1)
-	{ 
+	{
+    
 		
-		   # l'actif courant appartient aux 100 meilleurs actifs
-		   if(mydata$stock_number[i] %in% selectedIndex &&((currentYear == mydata$year[i]-1 && currentMonth == 12) 
-		      || (currentYear == mydata$year[i] && currentMonth == mydata$month[i]-1)))
+		   # l'actif courant appartient aux 100 meilleurs actifs et les dates se suivent
+		   if(mydata$stock_number[i] %in% selectedIndex && currentYear == mydata$year[i] )
 		   {
-           
+           #First month
+  		     if(mydata$month[i] == 7 ){
+  		       indexVector<-c(indexVector,currentStockNumber);  
+  		       currentStockNumber= mydata$stock_number[i];
+             date = 0 ;
+  		       
+  		     }
+         
+           # On passe à l'actif suivant
            if(date == 6 && mydata$stock_number[i] != currentStockNumber){                
              currentStockNumber = mydata$stock_number[i];
+             currentYear<- firstYear+j;
+             currentMonth<- firstMonth;
              date = 0;
            }
-           if(date == 0){
-             indexVector<-c(indexVector,currentStockNumber);  
-             currentStockNumber= mydata$stock_number[i];
-           }
+           
            if(date<6){		        
     	       indFacteur = intersect(which(dataFacteurs$year == mydata$year[i]),which(dataFacteurs$month ==mydata$month[i]))
     	       rf= as.numeric(dataFacteurs$Risk.Free.Return[indFacteur]);
@@ -62,18 +62,16 @@ indexVectorBottom<- NULL;
     				  {
     					  renta <- c(renta, (as.numeric(mydata$return_rf[i-date]) + as.numeric(mydata$rf[i-1])));	
     				  } 			
-  				      date = date + 1 ;
-  		        }
+				      date = date + 1 ;
+    					currentYear<- mydata$year[i];
+    					currentMonth<- mydata$month[i];
+  		      }
+    					
   		        
-		        }
-      		  currentYear<- mydata$year[i];
-      		  currentMonth<- mydata$month[i];
-	
-  	}
+	    }
+      		  
+  }
 		  
-  		
-	
-  
 	for (actif in 1:100)
 	{
 	  renta_arithmetique[actif]= 1 ;
@@ -107,10 +105,10 @@ indexVectorBottom<- NULL;
     }
     
   }
+  matrixBottom[j+1,] = indexVectorBottom;
+  matrixTop[j+1,] = indexVectorTop;
+  
+  
+}
 
-	#on crée le premier pf avec les actifs aux renta les plus fortes
-	portefeuille1 <- 0.1 * (sum(renta_top));
-
-	#on crée le premier pf avec les actifs aux renta les plus faibles
-	portefeuille10 <- 0.1 * (sum(renta_bottom));
   

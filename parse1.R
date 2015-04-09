@@ -1,4 +1,4 @@
-dataFilename=paste(getwd(),"/data_final.csv", sep="")
+sdataFilename=paste(getwd(),"/data_final.csv", sep="")
 mydata = read.csv(dataFilename,stringsAsFactors=FALSE) 
 stockVector<-NULL;
 indexVector<-NULL;
